@@ -24,8 +24,10 @@ use FormSystem\form\ButtonForm;
 use JsonException;
 use JunKR\communitysystem;
 use JunKR\CrossUtils;
+use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\block\Crops;
+use pocketmine\block\NetherWartPlant;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\EventPriority;
 use pocketmine\event\Listener;
@@ -37,6 +39,7 @@ use pocketmine\Player;
 use pocketmine\plugin\MethodEventExecutor;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\AsyncTask;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 
@@ -84,6 +87,10 @@ class Gift2022 extends PluginBase implements Listener{
 
         $block = $ev->getBlock();
         if(!($block instanceof Crops || $block->getId() === BlockIds::NETHER_WART_PLANT)){
+            return;
+        }
+
+        if((($block instanceof Crops && $block->getDamage() < 7) || ($block->getId() === BlockIds::NETHER_WART_PLANT && $block->getDamage() < 3))){
             return;
         }
 
