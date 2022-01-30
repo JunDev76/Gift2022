@@ -24,10 +24,10 @@ use FormSystem\form\ButtonForm;
 use JsonException;
 use JunKR\communitysystem;
 use JunKR\CrossUtils;
-use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\block\Crops;
-use pocketmine\block\NetherWartPlant;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\EventPriority;
 use pocketmine\event\Listener;
@@ -39,7 +39,6 @@ use pocketmine\Player;
 use pocketmine\plugin\MethodEventExecutor;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\AsyncTask;
-use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 
@@ -59,8 +58,24 @@ class Gift2022 extends PluginBase implements Listener{
     public function onEnable() : void{
         $this->db = CrossUtils::getDataArray($this->getDataFolder() . 'data.json');
 
+        if(!isset($this->db['on'])){
+            $this->db['on'] = false;
+        }
+
+        CrossUtils::registercommand('gift2022', $this, 'on/off', 'op');
         $this->getServer()->getPluginManager()->registerEvent(BlockBreakEvent::class, $this, EventPriority::MONITOR, new MethodEventExecutor('onBreak'), $this);
         $this->getServer()->getPluginManager()->registerEvent(DataPacketReceiveEvent::class, $this, EventPriority::MONITOR, new MethodEventExecutor('onDataPacket'), $this);
+    }
+
+    public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
+        if($command->getName() === 'gift2022'){
+            if(!isset($args[0])){
+                return true;
+            }
+
+            $this->db['on'] = $args[0] === 'on';
+        }
+        return true;
     }
 
     /**
@@ -75,6 +90,10 @@ class Gift2022 extends PluginBase implements Listener{
      */
     public function onBreak(BlockBreakEvent $ev) : void{
         if($ev->isCancelled()){
+            return;
+        }
+
+        if(!$this->db['on']){
             return;
         }
 
