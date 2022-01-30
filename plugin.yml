@@ -1,0 +1,7 @@
+name: Gift2022
+main: JunDev76\Gift2022\Gift2022
+version: 1.0.0
+author: JunDev76
+author-github: https://github.com/JunDev76
+api:
+  - 3.0.0
